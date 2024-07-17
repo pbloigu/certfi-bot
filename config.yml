@@ -1,0 +1,10 @@
+runAs:
+  uid: 1000
+  gid: 1000
+schedule:
+  intervalHours: 3
+feed:
+  url: https://www.kyberturvallisuuskeskus.fi/feed/rss/en/401
+server:
+  url: http://localhost:3000
+  accessToken: whH1OQOzXP1mwFP9_87HNy36KNiN98wBLX-eK0l--W0
