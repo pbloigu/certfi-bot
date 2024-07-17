@@ -12,7 +12,7 @@ This is a personal Golang learning project and as such likely not much of use fo
 
 ### Installing
 
-* Download the latest release for your architecture
+* ~~Download the latest release for your architecture~~ Build with `go build`.
 * Write a configuration file (in .yaml format) and place it in /etc/certfi-bot/config.yml. Make it root readable only. See the [test config file](./config.yml) for reference.
 
 ### Executing program
