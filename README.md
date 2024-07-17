@@ -14,7 +14,7 @@ The bot is tooting here: https://botsin.space/@certfibot
 
 ### Installing
 
-* ~~Download the latest release for your architecture~~ Build with `go build`.
+* Download the [latest release](https://github.com/pbloigu/certfi-bot/releases) for your architecture or build with `go build`.
 * Write a configuration file (in .yaml format) and place it in /etc/certfi-bot/config.yml. Make it root readable only. See the [test config file](./config.yml) for reference.
 
 ### Executing program
