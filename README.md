@@ -18,7 +18,7 @@ The bot is tooting here: https://botsin.space/@certfibot
 * Write a configuration file (in .yaml format) and place it in /etc/certfi-bot/config.yml. Make it root readable only. See the [test config file](./config.yml) for reference.
 
 ### Executing program
-Execute the binary. It will remain running until killed and keep checking the CERT-FI rss feed at configured intervals.
+Execute the binary as root (privileges are dropped after reading the config file, and the identity of the user specified in the config file is assumed). It will remain running until killed and keep checking the CERT-FI rss feed at configured intervals.
 
 ## Help
 
