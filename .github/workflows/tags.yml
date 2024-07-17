@@ -1,0 +1,66 @@
+# This workflow will build a golang project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+
+name: Tags
+
+on:
+  push:
+    tags: [ "[0-9]+.[0-9]+.[0-9]+", "[0-9]+.[0-9]+.[0-9]+-beta.[0-9]+" ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.22.4'
+
+    - name: Test
+      run: go test -v ./...
+
+    - name: Dump GitHub context
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
+      run: |
+        echo "$GITHUB_CONTEXT"
+
+    - name: Check branch
+      id: check-branch
+      run: | 
+        raw=$(git branch -r --format='%(refname:short)' --contains ${{ github.ref }})
+        branch="$(echo ${raw//origin\//} | tr -d '\n')"
+        echo "name=$branch" >> $GITHUB_OUTPUT
+        echo "Branches where this tag exists : $branch."
+    
+    - name: Test
+      run: go test -v ./...
+    
+    - name: Build amd64
+      run: env GOOS=linux GOARCH=amd64 go build -o certfi-bot_amd64
+
+    - name: Build arm64
+      run: env GOOS=linux GOARCH=arm64 go build -o certfi-bot_arm64
+
+    - name: Release
+      uses: softprops/action-gh-release@v2
+      if: startsWith(github.ref, 'refs/tags/') && contains(steps.check-branch.outputs.name, 'main') && !contains(github.ref, 'beta')
+      with:
+        files: |
+          certfi-bot_amd64
+          certfi-bot_arm64
+        prerelease: false
+
+    - name: Beta
+      uses: softprops/action-gh-release@v2
+      if: startsWith(github.ref, 'refs/tags/') && contains(steps.check-branch.outputs.name, 'main') && contains(github.ref, 'beta')
+      with:
+        files: |
+          certfi-bot_amd64
+          certfi-bot_arm64
+        prerelease: false
