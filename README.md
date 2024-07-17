@@ -6,7 +6,9 @@ Watches the [CERT-FI](https://www.kyberturvallisuuskeskus.fi/en/our-activities/c
 
 Periodically (period configurable) reads the CERT-FI alert RSS feed (address configurable) and if new entries found after the last reading, constructs a Mastodon status message, which is then publised to a Mastodon instance (address and login details configurable).
 
-This is a personal Golang learning project and as such likely not much of use for anyone else. Using this as an example of anything but maybe bad code is highly discouraged. 
+This is a personal Golang learning project and as such likely not much of use for anyone else. Using this as an example of anything but maybe bad code is highly discouraged.
+
+The bot is tooting here: https://botsin.space/@certfibot
 ## Getting Started
 
 
