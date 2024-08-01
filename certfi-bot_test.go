@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/mmcdole/gofeed"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestMain(m *testing.M) {
@@ -25,31 +26,22 @@ func TestCreateToot(t *testing.T) {
 	}
 	toot := createToot(item)
 
-	if toot.Language != "en" {
-		t.Fatalf("Language was not en")
-	}
-	if toot.Visibility != "public" {
-		t.Fatalf("Visibility was not public")
-	}
-	if toot.Status != fmt.Sprintf("%s\n%s\n\n%s", item.Title, item.Description, item.Link) {
-		t.Fatalf("Status was not " + fmt.Sprintf("%s\n%s\n\n%s", item.Title, item.Description, item.Link))
-	}
+	assert.Equal(t, "en", toot.Language, "Language wrong.")
+	assert.Equal(t, "public", toot.Visibility, "Visibility wrong.")
+	assert.Equal(t, fmt.Sprintf("%s\n%s\n\n%s", item.Title, item.Description, item.Link), toot.Status, "Status wrong.")
+
 }
 
 func TestIsNotNew(t *testing.T) {
 	interval := time.Duration(1) * time.Hour
 	pubTime, _ := time.Parse(time.RFC1123, "Wed, 03 Jul 2024 04:10:44 GMT")
-	if isNew(pubTime, interval) {
-		t.Fatalf("Feed was detected as new while shouldn't have been.")
-	}
+	assert.False(t, isNew(pubTime, interval), "Feed was detected as new while shouldn't have been.")
 }
 
 func TestIsNew(t *testing.T) {
 	interval := time.Duration(1) * time.Hour
 	pubTime := time.Now().Add(time.Duration(-30) * time.Minute)
-	if !isNew(pubTime, interval) {
-		t.Fatalf("Feed was not detected as new while should have been.")
-	}
+	assert.True(t, isNew(pubTime, interval), "Feed was not detected as new while should have been.")
 }
 
 func TestCreateRequest(t *testing.T) {
@@ -63,12 +55,6 @@ func TestCreateRequest(t *testing.T) {
 	authHeader := request.Header.Get("Authorization")
 	idempotencyHeader := request.Header.Get("Idempotency-Key")
 
-	if authHeader != "Bearer "+config.Server.AccessToken {
-		t.Fatalf("Authorization header was not what is expected")
-	}
-
-	if idempotencyHeader == "" {
-		t.Fatalf("Idempotency-Key header was not set")
-	}
-
+	assert.Equal(t, "Bearer "+config.Server.AccessToken, authHeader, "Authorization header was not what is expected")
+	assert.NotNil(t, idempotencyHeader, "Idempotency-Key header was not set")
 }
