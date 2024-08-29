@@ -49,9 +49,8 @@ func main() {
 
 	setupLoggig()
 	ensureRoot()
-	contents := readConfiguration("/etc/certfi-bot/config.yml")
+	parseConfiguration(readConfiguration("/etc/certfi-bot/config.yml"))
 	dropRoot()
-	parseConfiguration(contents)
 
 	s := getScheduler()
 
@@ -77,6 +76,7 @@ func ensureRoot() {
 func dropRoot() {
 	syscall.Setgid(config.RunAs.Gid)
 	syscall.Setuid(config.RunAs.Uid)
+	log.Debug().Any("gid", os.Getgid()).Any("uid", os.Getuid()).Msg("Root privileges dropped.")
 }
 
 func waitForTermination() {
