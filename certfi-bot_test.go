@@ -7,12 +7,12 @@ import (
 	"time"
 
 	"github.com/mmcdole/gofeed"
+	"github.com/pbloigu/gonfig"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestMain(m *testing.M) {
-	contents := readConfiguration("config.yml")
-	parseConfiguration(contents)
+	gonfig.Get("config.yml", &config)
 	exitCode := m.Run()
 	os.Exit(exitCode)
 }

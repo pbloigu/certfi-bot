@@ -13,11 +13,11 @@ import (
 
 	"github.com/go-co-op/gocron/v2"
 	"github.com/google/uuid"
+	"github.com/pbloigu/gonfig"
 
 	"github.com/mmcdole/gofeed"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	"gopkg.in/yaml.v2"
 )
 
 type configStruct struct {
@@ -37,6 +37,18 @@ type configStruct struct {
 	} `yaml:"server"`
 }
 
+func (c *configStruct) Uid() int {
+	return c.RunAs.Uid
+}
+
+func (c *configStruct) Gid() int {
+	return c.RunAs.Gid
+}
+
+func (c *configStruct) StatePath() string {
+	return ""
+}
+
 type toot struct {
 	Status     string `json:"status"`
 	Visibility string `json:"visibility"`
@@ -46,11 +58,8 @@ type toot struct {
 var config configStruct
 
 func main() {
-
 	setupLoggig()
-	ensureRoot()
-	parseConfiguration(readConfiguration("/etc/certfi-bot/config.yml"))
-	dropRoot()
+	gonfig.Get("/etc/certfi-bot/config.yml", &config)
 
 	s := getScheduler()
 
@@ -64,19 +73,6 @@ func main() {
 	if err != nil {
 		log.Error().AnErr("error", err).Msg("Scheduler stop failed.")
 	}
-}
-
-func ensureRoot() {
-	if os.Getuid() != 0 {
-		log.Error().Msg("Must be run as root (will drop privs later).")
-		os.Exit(-1)
-	}
-}
-
-func dropRoot() {
-	syscall.Setgid(config.RunAs.Gid)
-	syscall.Setuid(config.RunAs.Uid)
-	log.Debug().Any("gid", os.Getgid()).Any("uid", os.Getuid()).Msg("Root privileges dropped.")
 }
 
 func waitForTermination() {
@@ -94,25 +90,6 @@ func setupLoggig() {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 		log.Debug().Msg("Debug logging enabled.")
 	}
-}
-
-func parseConfiguration(b []byte) {
-	decoder := yaml.NewDecoder(bytes.NewReader(b))
-	err := decoder.Decode(&config)
-	if err != nil {
-		log.Error().AnErr("error", err).Msg("Reading configuration failed.")
-		os.Exit(-1)
-	}
-	log.Info().Msg("Configuration acquired.")
-}
-
-func readConfiguration(filename string) []byte {
-	contents, err := os.ReadFile(filename)
-	if err != nil {
-		log.Error().AnErr("error", err).Msg("Reading configuration failed.")
-		os.Exit(-1)
-	}
-	return contents
 }
 
 func getScheduler() gocron.Scheduler {

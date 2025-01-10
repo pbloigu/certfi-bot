@@ -1,8 +1,6 @@
 module github.com/pbloigu/certfi-bot
 
-go 1.23
-
-toolchain go1.23.4
+go 1.23.4
 
 require (
 	github.com/go-co-op/gocron/v2 v2.14.1
@@ -26,6 +24,7 @@ require (
 	github.com/mmcdole/goxpp v1.1.1 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
+	github.com/pbloigu/gonfig v0.0.0-20250110172421-5f9e72ea5974 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/rogpeppe/go-internal v1.9.0 // indirect
