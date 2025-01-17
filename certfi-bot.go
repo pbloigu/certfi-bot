@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"net/http"
@@ -12,6 +11,7 @@ import (
 	"time"
 
 	"github.com/go-co-op/gocron/v2"
+	"github.com/go-playground/form/v4"
 	"github.com/google/uuid"
 	"github.com/pbloigu/gonfig"
 
@@ -50,16 +50,20 @@ func (c *configStruct) StatePath() string {
 }
 
 type toot struct {
-	Status     string `json:"status"`
-	Visibility string `json:"visibility"`
-	Language   string `json:"language"`
+	Status     string `form:"status"`
+	Visibility string `form:"visibility"`
+	Language   string `form:"language"`
 }
 
 var config configStruct
 
+var encoder = form.NewEncoder()
+
 func main() {
 	setupLoggig()
-	gonfig.Get("/etc/certfi-bot/config.yml", &config)
+	if err := gonfig.Get("/etc/certfi-bot/config.yml", &config); err != nil {
+		log.Panic().Err(err).Msg("Startup failed.")
+	}
 
 	s := getScheduler()
 
@@ -161,8 +165,8 @@ func doToot(r http.Request) {
 }
 
 func createRequest(t toot) http.Request {
-	body, _ := json.Marshal(t)
-	bodyReader := bytes.NewReader(body)
+	body, _ := encoder.Encode(&t)
+	bodyReader := bytes.NewReader([]byte(body.Encode()))
 	request, _ := http.NewRequest("POST", config.Server.Host+"/api/v1/statuses", bodyReader)
 	request.Header.Add("Authorization", "Bearer "+config.Server.AccessToken)
 	request.Header.Add("Idempotency-Key", uuid.NewString())
